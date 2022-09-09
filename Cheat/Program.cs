@@ -1,0 +1,4 @@
+﻿
+#region Делегаты
+
+#endregion
