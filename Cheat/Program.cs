@@ -6,13 +6,16 @@
 namespace Cheat
 {
     #region Расширения
+
+    
+
     static class TestRas
     {
         public static void TestRashir(this int a)
         {
-            Console.WriteLine(a);
+            Console.WriteLine("STATY");
+            
         }
-
     }
 
     #endregion
@@ -24,6 +27,26 @@ namespace Cheat
     {
         static void Main(string[] args)
         {
+            Car car = new Car("BMW");
+
+            car.Exploded += TestEvnet;
+
+            void TestEvnet(object sender, CarEventArgs e)
+            {
+                Console.WriteLine($"{(sender as Car).Name} сказал {e.message}");
+            }
+
+            void TestEvent2(object sender, CarEventArgs e)
+            {
+                Console.WriteLine(1 + 1);
+            }
+
+            car.Exploded += TestEvent2;
+        
+
+            car.Message();
+
+
             #region Func, Action
 
             Func<int, int, string> stringMath;
@@ -71,7 +94,52 @@ namespace Cheat
         }
     }
 
-   
+
+
+    #endregion
+
+    #region События
+
+    public class CarEventArgs : EventArgs
+    {
+
+        public readonly string message;
+
+        public CarEventArgs(string m)
+        {
+            message = m;
+        }
+    }
+
+    public class Car
+    {
+        public delegate void CarEngineHanlder(object sender, CarEventArgs e);
+
+        public event CarEngineHanlder Exploded;
+        public event CarEngineHanlder AboutToBlow;
+
+        public string Name { get; set; }
+
+        public void Message()
+        {
+            Exploded?.Invoke(this, new CarEventArgs("Test"));
+        }
+
+        public Car(string name)
+        {
+            Name = name;
+        }
+       
+    }
+
+    public class Start
+    {
+        void StartEvent(object sender, CarEventArgs e)
+        {
+            Console.WriteLine(sender + "says" + e.message);
+        } 
+    }
+
 
     #endregion
 
@@ -113,6 +181,56 @@ namespace Cheat
 
     #endregion
 
+    #region Многопотчность
+
+    class Threads
+    {
+   
+        void Main()
+        {
+            /// Создание дополнительного потока
+            Thread task = new Thread(Method1);
+
+            /// Поток принимающий в себя делегат который ничего не возвращяет, параметром принимает obj.
+            /// В этот самый обж можем сувать что угодно
+            Thread task2 = new Thread(new ParameterizedThreadStart(Method2));
+
+            /// Запуск самих потоков соответственно
+            task.Start();
+            task2.Start("123");
+
+            for (int i = 0; i < 100; i++)
+            {
+                Thread.Sleep(10);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("-");
+
+            }
+        }
+
+        void Method1()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                Thread.Sleep(10);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("+");
+
+            }
+        }
+
+        void Method2(object p)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                Thread.Sleep(10);
+                Console.Write(p);
+            }
+        }
+
+}
+
+    #endregion
 }
 
 
